@@ -1,4 +1,3 @@
-
 from pygame import *
 
 win = display.set_mode((700, 500))
@@ -6,6 +5,9 @@ win_width = 700
 win_height = 500
 display.set_caption('Пинг Понг')
 bg = transform.scale(image.load('sky.jpg'), (win_width, win_height))
+
+speed_x = 3
+speed_y = 3
 
 class GameSprite(sprite.Sprite):
      def __init__(self, pImage, px, py, pSpeed,imageWidth,imageHeight):
@@ -33,23 +35,38 @@ class Player(GameSprite):
              self.rect.y += self.speed
 
 font.init()
-font1 = font.SysFont(None, 40)
-font2 = font.SysFont(None, 80)
-lose = font2.render('Вы проиграли',1,(255,0,0))
-won = font2.render('Вы выйграли',1,(0,255,0))
+font2 = font.SysFont(None, 40)
+lose1 = font2.render('1p lose',True,(255,0,0))
+lose2 = font2.render('2p lose',True,(255,0,0))
 
-rocket1 = Player('racket.png', 25, 250, 5,35,70)
-rocket2 = Player('racket.png', 625, 250, 5,35,70)
+
+racket1 = Player('racket.png', 25, 250, 5,35,70)
+racket2 = Player('racket.png', 625, 250, 5,35,70)
+ball = GameSprite('tenis_ball.png', 350, 250, 0, 50, 50)
 
 game = True
+finish = False
 while game:
     for e in event.get():
         if e.type == QUIT:
             game = False
-    win.blit(bg,(0, 0))
-    rocket1.update_l()
-    rocket1.reset()
-    rocket2.update_r()
-    rocket2.reset()
+    if finish != True:
+        ball.rect.x += speed_x
+        ball.rect.y += speed_y
+        win.blit(bg,(0, 0))
+        racket1.update_l()
+        racket1.reset()
+        racket2.update_r()
+        racket2.reset()
+        ball.reset()
+    if ball.rect.y > win_height - 50 or ball.rect.y < 0:
+        speed_y *= -1
+    if sprite.collide_rect(racket1, ball) or sprite.collide_rect(racket2, ball):
+        speed_x *= -1
+    if ball.rect.x < 0:
+        finish = True
+        win.blit(lose1, (200, 200))
+    if ball.rect.x > 675:
+        finish = True
+        win.blit(lose2, (200, 200))
     display.update()
-    
